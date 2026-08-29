@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "db-analyzer": {
+      "command": "python",
+      "args": ["-m", "nexusdb.server"]
+    }
+  }
+}
