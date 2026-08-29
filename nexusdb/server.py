@@ -2,6 +2,7 @@
 MCP 数据库分析服务
 """
 
+import argparse
 from typing import List, Dict, Any
 from mcp.server.mcpserver import MCPServer
 
@@ -49,16 +50,45 @@ def describe_table_tool(database: str, table: str) -> List[Dict[str, Any]]:
         return [{"error": str(e)}]
 
 
+def parse_args():
+    """解析命令行参数"""
+    parser = argparse.ArgumentParser(description="MCP 数据库分析服务")
+    parser.add_argument(
+        "--mode",
+        choices=["stdio", "sse"],
+        default="stdio",
+        help="传输模式：stdio（默认）或 sse"
+    )
+    parser.add_argument(
+        "--host",
+        default="127.0.0.1",
+        help="SSE 模式监听地址（默认：127.0.0.1）"
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=8000,
+        help="SSE 模式端口号（默认：8000）"
+    )
+    return parser.parse_args()
+
+
 def main():
     """主函数"""
+    args = parse_args()
+    
     print("启动 MCP 数据库分析服务...")
     print("可用工具:")
     print("  - list_tables_tool: 获取数据库所有表")
     print("  - describe_table_tool: 查看表结构")
-    print("\n服务运行中...")
     
-    # 运行 MCP 服务器
-    mcp.run()
+    if args.mode == "sse":
+        print(f"\nSSE 服务模式: http://{args.host}:{args.port}")
+        print(f"SSE 端点: http://{args.host}:{args.port}/sse")
+        mcp.run(transport="sse", host=args.host, port=args.port)
+    else:
+        print("\nstdio 模式运行中...")
+        mcp.run(transport="stdio")
 
 
 if __name__ == "__main__":
