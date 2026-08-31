@@ -37,14 +37,13 @@ pip install -e .
 
 ### 启动模式
 
-支持两种传输模式：
+本项目仅支持 stdio 模式，用于本地 OpenCode 集成。
 
-| 模式 | 命令 | 适用场景 |
-|------|------|----------|
-| stdio | `python -m nexusdb.server` | OpenCode集成（默认） |
-| sse | `python -m nexusdb.server --mode sse` | 服务部署、多用户 |
+```bash
+python -m nexusdb.server
+```
 
-### OpenCode集成（stdio模式）
+### OpenCode集成
 
 配置完成后，OpenCode会自动启动MCP服务，无需手动运行。
 
@@ -56,39 +55,6 @@ pip install -e .
     "db-analyzer": {
       "command": "python",
       "args": ["-m", "nexusdb.server"]
-    }
-  }
-}
-```
-
-### SSE服务模式
-
-启动服务：
-
-```bash
-# 默认配置（127.0.0.1:8000）
-python -m nexusdb.server --mode sse
-
-# 自定义地址和端口
-python -m nexusdb.server --mode sse --host 0.0.0.0 --port 9000
-```
-
-启动后显示：
-
-```
-SSE 服务模式: http://127.0.0.1:8000
-SSE 端点: http://127.0.0.1:8000/sse
-```
-
-### 连接SSE服务
-
-OpenCode配置（`.opencode/config.json`）：
-
-```json
-{
-  "mcpServers": {
-    "db-analyzer": {
-      "url": "http://localhost:8000/sse"
     }
   }
 }
@@ -141,20 +107,6 @@ OpenCode配置（`.opencode/config.json`）：
 }
 ```
 
-### 通用SSE模式配置
-
-任何支持MCP的客户端都可以连接SSE服务：
-
-```json
-{
-  "mcpServers": {
-    "db-analyzer": {
-      "url": "http://localhost:8000/sse"
-    }
-  }
-}
-```
-
 ## 自然语言调用
 
 配置完成后，在对话中直接使用自然语言：
@@ -195,24 +147,8 @@ pytest tests/test_tables.py::TestListTables::test_list_tables_returns_list
 
 使用MCP Inspector交互式测试工具：
 
-#### 测试stdio模式
-
 ```bash
 npx @modelcontextprotocol/inspector python -m nexusdb.server
-```
-
-#### 测试SSE模式
-
-**终端1** - 启动SSE服务：
-
-```bash
-python -m nexusdb.server --mode sse --port 8000
-```
-
-**终端2** - 启动Inspector连接服务：
-
-```bash
-npx @modelcontextprotocol/inspector http://localhost:8000/sse
 ```
 
 打开浏览器访问Inspector界面，可以：
