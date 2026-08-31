@@ -20,8 +20,7 @@ nexusdb/
 ├── tests/
 │   ├── __init__.py
 │   └── test_tables.py         # pytest测试
-├── .opencode/
-│   └── config.json            # MCP配置
+├── opencode.json            # OpenCode MCP配置
 ├── .gitignore
 ├── pyproject.toml
 └── README.md
@@ -45,36 +44,77 @@ python -m nexusdb.server
 
 ### OpenCode集成
 
-配置完成后，OpenCode会自动启动MCP服务，无需手动运行。
-
-`.opencode/config.json` 已自动配置：
-
-```json
-{
-  "mcpServers": {
-    "db-analyzer": {
-      "command": "python",
-      "args": ["-m", "nexusdb.server"]
-    }
-  }
-}
-```
+配置完成后，OpenCode 会自动启动 MCP 服务，无需手动运行。
 
 ## MCP客户端配置
 
 ### OpenCode
 
-在项目根目录创建 `.opencode/config.json`：
+支持两种配置方式：全局配置和项目配置。
+
+#### 全局配置（推荐）
+
+全局配置对所有项目生效。编辑 `~/.config/opencode/opencode.json`：
 
 ```json
 {
-  "mcpServers": {
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
     "db-analyzer": {
-      "command": "python",
-      "args": ["-m", "nexusdb.server"]
+      "type": "local",
+      "command": ["python", "-m", "nexusdb.server"],
+      "enabled": true
     }
   }
 }
+```
+
+> Windows 路径：`C:\Users\<用户名>\.config\opencode\opencode.json`
+
+#### 项目配置
+
+仅对当前项目生效。在项目根目录创建 `opencode.json`：
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "db-analyzer": {
+      "type": "local",
+      "command": ["python", "-m", "nexusdb.server"],
+      "enabled": true
+    }
+  }
+}
+```
+
+项目配置会覆盖全局配置中的同名 MCP 服务器。
+
+#### 验证配置
+
+```bash
+# 列出所有已配置的 MCP 服务器及连接状态
+opencode mcp list
+```
+
+输出示例：
+
+```
+Name          Type    Status  Command
+db-analyzer   local   ready   python -m nexusdb.server
+```
+
+其他管理命令：
+
+```bash
+# 认证 OAuth 类型的 MCP 服务器
+opencode mcp auth <server-name>
+
+# 移除 OAuth 凭据
+opencode mcp logout <server-name>
+
+# 调试连接问题
+opencode mcp debug <server-name>
 ```
 
 ### Claude Code
